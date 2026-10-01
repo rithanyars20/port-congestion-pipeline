@@ -1,0 +1,5 @@
+name: port_dbt
+version: "1.0"
+profile: port_dbt
+model-paths: ["models"]
+test-paths: ["tests"]
