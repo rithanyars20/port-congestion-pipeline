@@ -1,0 +1,39 @@
+name: Weekly Port Pipeline
+
+on:
+  schedule:
+    - cron: "0 18 * * 2"   # every Tuesday at 18:00 UTC
+  workflow_dispatch:        # lets you also trigger it manually from GitHub
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Run the pipeline
+        run: |
+          python extract.py
+          python load.py
+          cd port_dbt
+          dbt run  --profiles-dir .
+          dbt test --profiles-dir .
+          cd ..
+          python export_results.py
+
+      - name: Save results back to the repo
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add outputs/weekly_port_arrivals.csv
+          git diff --staged --quiet || git commit -m "Update weekly results"
+          git push

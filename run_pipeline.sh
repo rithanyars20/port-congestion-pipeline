@@ -6,3 +6,5 @@ python load.py
 cd port_dbt
 dbt run  --profiles-dir .
 dbt test --profiles-dir .
+cd ..
+python export_results.py

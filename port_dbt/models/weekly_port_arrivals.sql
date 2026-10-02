@@ -19,3 +19,4 @@ select *,
               or actual_calls > 1.4 * expected_calls then 'unusual'
             else 'normal' end as flag
 from with_expected
+where week_start < date_trunc('week', current_date)
